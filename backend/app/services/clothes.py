@@ -1,36 +1,11 @@
 import uuid
-import shutil
-from pathlib import Path
 
-from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
 from app.models.clothes import Clothes
-
-ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-
-
-def _validate_image(filename: str) -> str:
-    ext = Path(filename).suffix.lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        raise ValueError(f"File type {ext} not allowed. Use: {', '.join(ALLOWED_EXTENSIONS)}")
-    return ext
-
-
-async def save_photo(file: UploadFile, profile_id: uuid.UUID) -> str:
-    ext = _validate_image(file.filename or "photo.jpg")
-    file_name = f"{profile_id}_{uuid.uuid4().hex}{ext}"
-
-    upload_dir = Path(settings.UPLOAD_DIR)
-    upload_dir.mkdir(parents=True, exist_ok=True)
-
-    file_path = upload_dir / file_name
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return file_name
+from app.schemas.clothes import ClothesResponse
+from app.services.photos import delete_photo
 
 
 async def create_clothes(
@@ -98,9 +73,22 @@ async def update_clothes(
     return item
 
 
+def to_clothes_response(item: Clothes) -> ClothesResponse:
+    photo = item.photo_path
+    photo_url = photo if photo.startswith("/") else f"/uploads/{photo}"
+    return ClothesResponse(
+        id=item.id,
+        profile_id=item.profile_id,
+        photo_url=photo_url,
+        category=item.category,
+        color=item.color,
+        season=item.season,
+        style=item.style,
+        created_at=item.created_at,
+    )
+
+
 async def delete_clothes(db: AsyncSession, item: Clothes) -> None:
-    photo_path = Path(settings.UPLOAD_DIR) / item.photo_path
-    if photo_path.exists():
-        photo_path.unlink()
+    delete_photo(item.photo_path)
     await db.delete(item)
     await db.commit()
