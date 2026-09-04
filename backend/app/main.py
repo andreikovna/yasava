@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 import app.models  # noqa: F401 — register all SQLAlchemy models
 from app.config import settings
-from app.routers import auth, clothes, profiles
+from app.routers import auth, clothes, outfits, profiles
 
 app = FastAPI(
     title="Yasava — Digital Wardrobe",
@@ -16,6 +16,7 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(profiles.router)
 app.include_router(clothes.router)
+app.include_router(outfits.router)
 
 upload_dir = Path(settings.UPLOAD_DIR)
 upload_dir.mkdir(parents=True, exist_ok=True)

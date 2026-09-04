@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.models.profile import Profile
 from app.models.user import User
 from app.services.auth import decode_token
 
@@ -42,3 +43,15 @@ async def get_current_user(
         )
 
     return user
+
+
+async def get_user_profile(
+    profile_id: uuid.UUID, user: User, db: AsyncSession
+) -> Profile:
+    result = await db.execute(
+        select(Profile).where(Profile.id == profile_id, Profile.user_id == user.id)
+    )
+    profile = result.scalar_one_or_none()
+    if not profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+    return profile
