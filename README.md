@@ -41,8 +41,12 @@ API docs available at http://localhost:8000/docs
 
 ### Mobile
 
+Expo SDK 54 (opens in the App Store / Play Store Expo Go).
+
 ```bash
 cd mobile
 npm install
 npx expo start
 ```
+
+On a physical device the app infers the API host from Metro. To override it, copy `mobile/.env.example` to `mobile/.env` and set `EXPO_PUBLIC_API_URL`.
