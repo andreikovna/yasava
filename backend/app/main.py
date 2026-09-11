@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 import app.models  # noqa: F401 — register all SQLAlchemy models
@@ -11,6 +12,14 @@ app = FastAPI(
     title="Yasava — Digital Wardrobe",
     description="API for the digital wardrobe app",
     version="0.1.0",
+)
+
+# Needed for Expo web: the browser sends OPTIONS before POST. Native apps skip CORS.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
