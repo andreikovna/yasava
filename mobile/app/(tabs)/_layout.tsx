@@ -1,10 +1,14 @@
 import { ComponentProps } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddTabButton } from '@/components/AddTabButton';
 import { colors } from '@/constants/theme';
+
+// Icon (22) + label (~12) + small gaps
+const TAB_BAR_CONTENT_HEIGHT = 52;
 
 function TabIcon({
   name,
@@ -17,14 +21,24 @@ function TabIcon({
 }
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = Platform.OS === 'web' ? 0 : insets.bottom;
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.tabActive,
         tabBarInactiveTintColor: colors.tabInactive,
+        tabBarLabelPosition: 'below-icon',
         tabBarLabelStyle: styles.label,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: {
+          backgroundColor: colors.tabBar,
+          borderTopColor: colors.border,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          height: TAB_BAR_CONTENT_HEIGHT + bottomInset,
+          paddingBottom: bottomInset,
+        },
       }}
     >
       <Tabs.Screen
@@ -73,13 +87,9 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: colors.tabBar,
-    borderTopColor: colors.border,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '500',
+    marginBottom: 2,
   },
 });
