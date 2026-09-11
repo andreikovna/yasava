@@ -41,7 +41,7 @@ API docs available at http://localhost:8000/docs
 
 ### Mobile
 
-Expo SDK 54 (opens in the App Store / Play Store Expo Go).
+Expo SDK 57 (opens in the App Store / Play Store Expo Go).
 
 ```bash
 cd mobile

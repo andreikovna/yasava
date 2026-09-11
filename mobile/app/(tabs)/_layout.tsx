@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet } from 'react-native';
+import { ColorValue, Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AddTabButton } from '@/components/AddTabButton';
@@ -15,7 +15,7 @@ function TabIcon({
   color,
 }: {
   name: ComponentProps<typeof Ionicons>['name'];
-  color: string;
+  color: ColorValue;
 }) {
   return <Ionicons name={name} size={22} color={color} />;
 }
