@@ -1,5 +1,9 @@
 import { getApiBaseUrl } from '@/config/api';
-import { useAuthStore } from '@/stores/auth-store';
+import {
+  clearPersistedSession,
+  persistSession,
+  useAuthStore,
+} from '@/stores/auth-store';
 import type { TokenResponse } from '@/types/api';
 
 export class ApiError extends Error {
@@ -63,12 +67,10 @@ async function refreshSession(): Promise<boolean> {
         skipAuth: true,
         query: { refresh_token: refreshToken },
       });
-      await useAuthStore
-        .getState()
-        .setSession(tokens.access_token, tokens.refresh_token);
+      await persistSession(tokens.access_token, tokens.refresh_token);
       return true;
     } catch {
-      await useAuthStore.getState().clearSession();
+      await clearPersistedSession();
       return false;
     }
   })();
