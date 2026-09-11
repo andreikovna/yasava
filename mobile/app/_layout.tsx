@@ -3,14 +3,16 @@ import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/theme';
+import { useAuthRedirect } from '@/hooks/use-auth-redirect';
 import { useAuthStore } from '@/stores/auth-store';
 
 export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: '(auth)',
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -29,37 +31,41 @@ const yasavaTheme = {
 };
 
 export default function RootLayout() {
-  const hydrate = useAuthStore((state) => state.hydrate);
-  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const bootstrap = useAuthStore((state) => state.bootstrap);
+  const isBootstrapped = useAuthStore((state) => state.isBootstrapped);
+
+  useAuthRedirect();
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    bootstrap();
+  }, [bootstrap]);
 
   useEffect(() => {
-    if (isHydrated) {
+    if (isBootstrapped) {
       SplashScreen.hideAsync();
     }
-  }, [isHydrated]);
+  }, [isBootstrapped]);
 
-  if (!isHydrated) {
+  if (!isBootstrapped) {
     return null;
   }
 
   return (
-    <ThemeProvider value={yasavaTheme}>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerTintColor: colors.text,
-          headerStyle: { backgroundColor: colors.background },
-          headerShadowVisible: false,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={yasavaTheme}>
+        <StatusBar style="dark" />
+        <Stack
+          screenOptions={{
+            headerTintColor: colors.text,
+            headerStyle: { backgroundColor: colors.background },
+            headerShadowVisible: false,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
